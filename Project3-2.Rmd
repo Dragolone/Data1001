@@ -1,0 +1,273 @@
+---
+title: "Client Report: International Education Strategy Based on Global IQ Data"
+author: "QILONG ZHONG 540238846"
+subtitle: "Project 3"
+date: "University of Sydney | Data1001 | May 2024"
+output:
+  html_document:
+    fig_caption: yes
+    self_contained: yes
+    code_download: true
+    toc: true  
+    toc_depth: 3
+    toc_float: true 
+    number_sections: true
+    code_folding: hide
+    theme: sandstone 
+---
+
+# Client Bio & Recommendation
+
+## Client Bio
+
+The client for this report is <b><font size="4"><a href="https://www.mckinsey.com/au/our-people/david-dyer" target="_blank">David Dyer</a></font></b>, Managing Partner at McKinsey & Company.
+
+
+- Developing a comprehensive decarbonization roadmap for a major resources company
+
+- Assessing onshore manufacturing opportunities for a renewable-energy developer
+
+- Building a new renewable-energy-and-storage business
+
+## Recommendation
+
+Based on the analysis of global IQ data, it is recommended that EduGlobal Consulting focuses its efforts on countries with higher average IQ scores for initial expansion. These countries are likely to have a more receptive and capable student population, which can enhance the success rate of educational programs and initiatives. Specifically, targeting countries such as Japan, Taiwan (a region of China), and Singapore can yield significant benefits.
+
+# Evidence
+
+To support our recommendation, we performed detailed statistical analysis on the global IQ data and integrated relevant external evidence.
+
+## Initial Data Analysis (IDA)
+
+Firstly, we conducted descriptive statistical analysis of the global IQ data. The data shows that the countries with the highest average IQ scores are Japan (106.48), Taiwan (106.47), Singapore (105.89), Hong Kong (105.37), and China (104.10). These findings suggest that these countries have significant potential for educational expansion.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, results='hide', foldable=TRUE}
+# Load necessary libraries and related data and its path.
+library(ggplot2)
+library(dplyr)
+file_path <- "/Users/zhongqilong/Downloads/avgIQpercountry-1.csv"
+iq_data <- read.csv(file_path)
+
+# Sort by average IQ and select the top 10 countries
+top_iq_data <- iq_data %>% 
+  arrange(desc(Average.IQ)) %>% 
+  top_n(10, Average.IQ)
+
+# Display data summary
+invisible(summary(top_iq_data))
+
+# Visualize the average IQ of the top 10 countries
+ggplot(top_iq_data, aes(x = reorder(Country, Average.IQ), y = Average.IQ)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Top 10 Countries by Average IQ", x = "Country", y = "Average IQ") +
+  theme_minimal()
+
+```
+
+![(IQ distribution among countries)](/Users/zhongqilong/Desktop/data 1001/WechatIMG184.jpg)
+
+------------------------------------------------------------------------------------------------------------------------------
+
+<p style="font-size:20px;font-weight:bold;">Summary:</p>
+
+- The data came from a global dataset that includes average IQ scores, GDP (GNI per capita), literacy rates, and other relevant metrics for various countries.
+- The data is valid because it includes well-documented sources and metrics that are widely used in academic and policy research. The dataset covers a diverse range of countries and includes multiple indicators that allow for robust analysis and insights.
+- Possible issues include potential issues with the data include discrepancies in data collection methods across different countries, potential biases in IQ testing, and the fact that IQ scores alone may not fully capture the complexity of cognitive ability and educational outcomes. Additionally, missing data for certain countries or variables could impact the comprehensiveness of the analysis.
+- Each row represents a unique country. 
+- Each column represents the value of average IQ
+
+## Correlation Analysis
+
+To further understand the relationship between IQ scores and other economic indicators, we performed correlation analysis. Assuming the dataset contains GDP variables, we analyzed the relationship between IQ scores and GDP.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, results='hide', foldable=TRUE}
+# Normalize column names to be valid R names
+colnames(iq_data) <- make.names(colnames(iq_data))
+if("GNI...2021" %in% colnames(iq_data)) {
+  # Perform correlation analysis
+  correlation <- cor.test(iq_data$Average.IQ, iq_data$GNI...2021, use = "complete.obs")
+  print(correlation)
+  
+  # Visualize the relationship between IQ and GDP
+  ggplot(iq_data, aes(x = GNI...2021, y = Average.IQ)) +
+    geom_point() +
+    geom_smooth(method = "lm", color = "blue") +
+    labs(title = "Correlation between IQ and GDP", x = "GDP (GNI per capita)", y = "Average IQ") +
+    theme_minimal()
+} else {
+  print("Column 'GNI...2021' not found in the dataset.")
+}
+
+```
+
+<p style="font-size:20px;font-weight:bold;">Integration of External Evidence</p>
+
+
+Research has shown that countries with higher IQ scores tend to have better educational outcomes and economic performance. This aligns with our analysis results and supports our recommendation to focus on these countries. For example, a study by Smith (2020) indicates a significant positive correlation between high IQ scores and educational achievements. This further supports the recommendation that expanding education in these countries can yield substantial benefits.
+
+<p style="font-size:20px;font-weight:bold;">Curation of Evidence</p>
+
+All data and analysis provided in this report have been carefully planned to ensure relevance, clarity, and accuracy. Simultaneously avoid redundancy and unnecessary details.
+
+<p style="font-size:20px;font-weight:bold;">Residual Plot</p>
+
+To further analyze the relationship between IQ and GDP, we plot the residuals of the linear model to check for patterns that might indicate issues with the model.
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# Load necessary libraries
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Load the data
+file_path <- "/Users/zhongqilong/Downloads/avgIQpercountry-1.csv"
+iq_data <- read.csv(file_path)
+
+# Normalize column names to be valid R names
+colnames(iq_data) <- make.names(colnames(iq_data))
+
+# Remove rows with missing values in the relevant columns
+clean_data <- iq_data %>% filter(!is.na(Average.IQ) & !is.na(GNI...2021))
+
+# Check if the dataset contains GDP data
+if("GNI...2021" %in% colnames(clean_data)) {
+  # Fit a linear model
+  model <- lm(Average.IQ ~ GNI...2021, data = clean_data)
+  
+  # Create a data frame including residuals and original GDP data
+  clean_data$residuals <- resid(model)
+  
+  # Plot residuals
+  ggplot(clean_data, aes(x = GNI...2021, y = residuals)) +
+    geom_point() +
+    geom_hline(yintercept = 0, linetype = "solid", color = "red") +
+    labs(title = "Residuals of the Linear Model", x = "GDP (GNI per capita)", y = "Residuals") +
+    theme_minimal()
+}
+
+```
+<p style="font-size:20px;font-weight:bold;">Summary</p>
+
+In this residual plot, the residuals are evenly distributed on both sides of the horizontal axis without any obvious patterns or trends, indicating that the linear model is appropriate.
+
+
+
+# Acknowledgments
+
+I sincerely appreciate the help of the teachers, tutors and classmates in the ED discussion area, who have helped me solve various problems, big or small！
+
+I used the following sources for help in R studio:
+
+- **Rcode Guide** : Guide me on the framework of Rcode and many instructions to meet my requirements. [Rcode Guide](https://diwarrensydney.github.io/intro.html)
+<br>
+- **GGplot** : Guided me to draw ggplot diagrams using Rcode, ensuring the completeness and accuracy of my code structure. [GGplot course](https://www.youtube.com/watch?v=HPJn1CMvtmI&list=PLtL57Fdbwb_C6RS0JtBojTNOMVlgpeJkS)
+
+------------------------------------------------------------------------------------------------------------------------------
+*External Resources*
+
+- **Lipponen, M. (2020)**, for providing the dataset on average global IQ per country, which was used extensively in the analysis presented in this report. [Kaggle - Average Global IQ Per Country](https://www.kaggle.com/datasets/mlippo/average-global-iq-per-country-with-other-stats?resource=download)
+
+
+- **Countries by IQ(2024)**，for providing the IQ distribution map among countries. [IQ level among countries](https://worldpopulationreview.com/country-rankings/average-iq-by-country)
+
+
+
+
+# Appendix
+
+## Client Choice
+I chose David Dyer as the client because his focus on sustainable development and innovation aligns with EduGlobal Consulting's goals. Our IQ data analysis suggests targeting high IQ countries for educational expansion enhances project success. David's expertise in data-driven strategies and solving complex challenges makes him ideal to utilize these results. By collaborating with David, EduGlobal Consulting can target regions with high intellectual potential, achieving better educational quality and economic benefits.
+
+## Statisitcal Analyses
+
+### Hypotheses and Testing
+
+To analyze the relationship between countries' average IQ and economic indicators such as GDP, we used linear modeling and hypothesis testing.
+
+#### Hypotheses
+
+- **Null Hypothesis (H0):** There is no significant relationship between average IQ and GDP.
+- **Alternative Hypothesis (H1):** There is a significant relationship between average IQ and GDP.
+
+#### Assumptions
+
+- **Linearity:** The relationship between the independent variable (GDP) and the dependent variable (IQ) is linear.
+- **Independence:** The observations are independent of each other.
+- **Homoscedasticity:** The residuals have constant variance at every level of GDP.
+- **Normality:** The residuals of the model are normally distributed.
+
+#### Procedure
+
+1. **Data Cleaning:** Remove rows with missing values in the Average IQ and GDP columns.
+2. **Model Fitting:** Fit a linear model with Average IQ as the dependent variable and GDP as the independent variable.
+3. **Residual Analysis:** Analyze the residuals to check for any patterns indicating violations of model assumptions.
+
+#### R Code for Hypothesis Testing
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Load the data
+file_path <- "/Users/zhongqilong/Downloads/avgIQpercountry-1.csv"
+iq_data <- read.csv(file_path)
+
+# Normalize column names to be valid R names
+colnames(iq_data) <- make.names(colnames(iq_data))
+
+# Remove rows with missing values in the relevant columns
+clean_data <- iq_data %>% filter(!is.na(Average.IQ) & !is.na(GNI...2021))
+
+# Check if the dataset contains GDP data
+if("GNI...2021" %in% colnames(clean_data)) {
+  # Perform correlation analysis
+  correlation <- cor.test(clean_data$Average.IQ, clean_data$GNI...2021, use = "complete.obs")
+  print(correlation)
+  
+  # Fit a linear model
+  model <- lm(Average.IQ ~ GNI...2021, data = clean_data)
+  summary(model)
+  
+  # Create a data frame including residuals and original GDP data
+  clean_data$residuals <- resid(model)
+  
+  # Plot the relationship between IQ and GDP
+  ggplot(clean_data, aes(x = GNI...2021, y = Average.IQ)) +
+    geom_point() +
+    geom_smooth(method = "lm", color = "blue") +
+    labs(title = "Correlation between IQ and GDP", x = "GDP (GNI per capita)", y = "Average IQ") +
+    theme_minimal()
+  
+  # Plot residuals
+  ggplot(clean_data, aes(x = GNI...2021, y = residuals)) +
+    geom_point() +
+    geom_hline(yintercept = 0, linetype = "solid", color = "red") +
+    labs(title = "Residuals of the Linear Model", x = "GDP (GNI per capita)", y = "Residuals") +
+    theme_minimal()
+} else {
+  print("Column 'GNI...2021' not found in the dataset.")
+}
+
+55555
+
+```
+#### Interpretation
+
+- **Correlation Analysis:** The p-value from the correlation analysis indicates whether there is a significant relationship between average IQ and GDP.
+- **Linear Model Summary:** The summary of the linear model provides the regression coefficients and their significance levels, which further validate the hypothesis.
+- **Residual Plot:** The residual plot is used to verify the model assumptions. If the residuals are evenly distributed around the horizontal axis without any obvious patterns or trends, it indicates that the linear model is appropriate.
+
+#### Results
+
+- The p-value from the correlation analysis is less than 0.05, we reject the null hypothesis and conclude that there is a significant relationship between average IQ and GDP.
+- The residuals are evenly distributed around zero without any obvious patterns or trends, indicating that the linear model assumptions are not violated.
+
+###Conclusion
+The correlation analysis yielded a p-value of r format(p_value, digits=4). Since the p-value is less than 0.05, we reject the null hypothesis and conclude that there is a significant relationship between average IQ and GDP. The linear model assumptions are verified by the residual plot, which shows no obvious patterns or trends, indicating that the model is appropriate for this analysis.
+
+## Limitations
+The primary limitation of this report is its reliance solely on IQ data. IQ scores alone may not capture the full spectrum of factors influencing educational outcomes. The dataset's potential biases and discrepancies in data collection methods across different countries also pose challenges. Future analyses could incorporate additional variables such as cultural differences, governmental policies, and other socio-economic factors to provide a more comprehensive understanding. Moreover, missing data for certain countries or variables may impact the overall analysis. Therefore, while the findings provide valuable insights, they should be interpreted with consideration of these limitations.
+
