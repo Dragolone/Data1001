@@ -1,6 +1,6 @@
 ---
 title: "Client Report: International Education Strategy Based on Global IQ Data"
-author: "QILONG ZHONG 540238846"
+author: "Dragolone"
 subtitle: "Project 3"
 date: "University of Sydney | Data1001 | May 2024"
 output:
